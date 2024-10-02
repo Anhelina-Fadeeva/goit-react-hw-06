@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useDispatch, useSelector } from 'react-redux';
+import ContactForm from './components/ContactForm/ContactForm';
+import ContactList from './components/ContactList/ContactList';
+import SearchBox from './components/SearchBox/SearchBox';
+import { addContact, deleteContact, selectContacts } from './redux/contactsSlice/contactsSlice';
+import { setSearchTerm, selectSearchTerm } from './redux/filtersSlice/filtersSlice';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const dispatch = useDispatch();
+  const userContacts = useSelector(selectContacts);
+  const searchUser = useSelector(selectSearchTerm);
+
+  const filteredContacts = userContacts.filter(item =>
+    item.name && item.name.toLowerCase().includes(searchUser.toLowerCase())
+  );
+
+  const handleSubmit = values => {
+    dispatch(addContact(values));
+  };
+
+  const handleDeleteContactUser = id => {
+    dispatch(deleteContact(id));
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1 className="pageTitle">Contact Book</h1>
+      <ContactForm addContact={handleSubmit} contacts={userContacts} />
+      <SearchBox setSearchUser={term => dispatch(setSearchTerm(term))} />
+      <ContactList
+        userContacts={filteredContacts}
+        handleDeleteContactUser={handleDeleteContactUser}
+      />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
