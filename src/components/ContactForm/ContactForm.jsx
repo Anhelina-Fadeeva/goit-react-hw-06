@@ -1,68 +1,83 @@
-import { ErrorMessage, Field, Form, Formik } from 'formik';
-import * as Yup from 'yup';
-import s from './ContactForm.module.css';
-import PropTypes from 'prop-types';
+import { Form, Formik, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import styles from "./ContactForm.module.css";
+import { addContact } from "../../redux/contactsSlice";
+import { useDispatch } from "react-redux";
 
-const ContactForm = ({ addContact, contacts }) => {
-  const orderSchema = Yup.object({
-    name: Yup.string()
-      .min(3, 'Minimum 3 characters')
-      .max(50, 'Maximum 50 characters')
-      .required('Name is required'),
-    number: Yup.string()
-      .matches(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number')
-      .required('Phone number is required'),
-  });
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .matches(/^[A-Za-zА-Яа-яЁё\s]+$/, "Name must only contain letters")
+    .min(3, "Too Short!")
+    .max(50, "Too Long!")
+    .required("Required"),
+  number: Yup.string()
+    .matches(/^[0-9]+$/, "Phone number must only contain numbers")
+    .min(3, "Too Short!")
+    .max(50, "Too Long!")
+    .required("Required"),
+});
+export default function ContactForm() {
+  const dispatch = useDispatch();
 
-  const handleForm = (values, { resetForm }) => {
-    const isDuplicate = contacts.some(
-      contact => contact.name.toLowerCase() === values.name.toLowerCase()
+  const initialValues = {
+    name: "",
+    number: "",
+  };
+
+  const handleSubmit = (values, actions) => {
+    dispatch(
+      addContact({
+        id: crypto.randomUUID(),
+        name: values.name,
+        number: values.number,
+      })
     );
-
-    if (isDuplicate) {
-      alert(`${values.name} is already in contacts`);
-      return;
-    }
-
-    addContact(values);
-    resetForm();
+    actions.resetForm();
   };
 
   return (
-    <div className={s.formWrapper}>
-      <Formik
-        initialValues={{ name: '', number: '' }}
-        onSubmit={handleForm}
-        validationSchema={orderSchema}
-      >
-        <Form className={s.contactForm}>
-          <label className={s.formLabel}>
-            Name
-            <Field className={s.formInput} name="name" placeholder="Enter name" />
-            <ErrorMessage className={s.inputErr} name="name" component="p" />
-          </label>
-          <label className={s.formLabel}>
-            Number
-            <Field className={s.formInput} name="number" placeholder="+1234567890" />
-            <ErrorMessage className={s.inputErr} name="number" component="p" />
-          </label>
-          <button className={s.formBtn} type="submit">
+    <Formik
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      validationSchema={validationSchema}
+    >
+      {({ isSubmitting }) => (
+        <Form className={styles.form}>
+          <div className={styles.formGroup}>
+            <label htmlFor="name" className={styles.label}>Name</label>
+            <Field 
+              type="text" 
+              name="name" 
+              id="name" 
+              className={styles.input} 
+            />
+            <ErrorMessage
+              name="name"
+              component="span"
+              className={styles.errorMessage}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="number" className={styles.label}>Number</label>
+            <Field 
+              type="tel" 
+              name="number" 
+              id="number" 
+              className={styles.input} 
+            />
+            <ErrorMessage
+              name="number"
+              component="span"
+              className={styles.errorMessage}
+            />
+          </div>
+
+          <button type="submit" className={styles.btn} disabled={isSubmitting}>
             Add contact
           </button>
         </Form>
-      </Formik>
-    </div>
+      )}
+    </Formik>
   );
-};
-
-ContactForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-};
-
-export default ContactForm;
+}

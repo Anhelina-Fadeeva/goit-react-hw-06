@@ -1,46 +1,30 @@
-import { useState, useEffect } from 'react';
-import s from './SearchBox.module.css';
+import { useSelector, useDispatch } from "react-redux";
+import { setSearchTerm } from "../../redux/filtersSlice";
 
-const SearchBox = ({ setSearchUser }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [error, setError] = useState('');
+import styles from "./SearchBox.module.css";
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchTerm.trim()) {
-        setSearchUser(searchTerm.toLowerCase());
-        setError(''); 
-      } else if (searchTerm === '') {
-        setSearchUser('');
-        setError(''); 
-      } else {
-        setError('Please enter a valid search term.');
-      }
-    }, 300); 
+export default function SearchBox() {
+  const searchTerm = useSelector((state) => state.filters.name);
+  const dispatch = useDispatch();
 
-    return () => clearTimeout(timer); 
-  }, [searchTerm, setSearchUser]);
-
-  const handleChange = event => {
-    setSearchTerm(event.target.value);
+  const handleInputChange = (event) => {
+    dispatch(setSearchTerm(event.target.value));
   };
 
   return (
-    <div className={s.searchWrap}>
-      <label htmlFor="searchInput" className={s.searchLabel}>
-        Find contact by name
+    <div className={styles.searchBox}>
+      <label htmlFor="searchInput" className={styles.label}>
+        Find contacts by name
       </label>
       <input
         id="searchInput"
-        className={`${s.searchInput} ${error ? s.errorInput : ''}`}
         type="text"
+        className={styles.input}
+        value={searchTerm}
+        onChange={handleInputChange}
         placeholder="Type a name..."
-        onChange={handleChange}
         aria-label="Search for contacts by name"
       />
-      {error && <span className={s.errorMessage}>{error}</span>}
     </div>
   );
-};
-
-export default SearchBox;
+}
