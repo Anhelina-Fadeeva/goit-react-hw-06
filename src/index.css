@@ -1,4 +1,4 @@
-/* Обнуление отступов и базовые стили */
+
 * {
   margin: 0;
   padding: 0;
@@ -36,7 +36,6 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Обертка основного контента */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -46,7 +45,6 @@ a:hover {
   border-radius: 8px;
 }
 
-/* Стили для кнопок */
 .button {
   padding: 10px 20px;
   background-color: #007bff;
@@ -61,7 +59,6 @@ a:hover {
   background-color: #0056b3;
 }
 
-/* Стили для текстовых полей */
 .inputField {
   width: 100%;
   padding: 10px;
@@ -71,7 +68,6 @@ a:hover {
   margin-bottom: 20px;
 }
 
-/* Стили для списка */
 .list {
   list-style: none;
   margin-top: 20px;
@@ -90,7 +86,6 @@ a:hover {
   background-color: #f1f1f1;
 }
 
-/* Стили для заголовков */
 .pageTitle {
   text-align: center;
   font-size: 2rem;
